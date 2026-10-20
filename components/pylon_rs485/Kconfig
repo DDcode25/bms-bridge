@@ -1,0 +1,97 @@
+menu "Pylontech RS485 (к инвертору)"
+
+    config PYLON_UART_NUM
+        int "Номер UART"
+        range 1 2
+        default 1
+
+    config PYLON_TX_GPIO
+        int "GPIO TX (к DI трансивера)"
+        default 17
+
+    config PYLON_RX_GPIO
+        int "GPIO RX (к RO трансивера)"
+        default 16
+
+    config PYLON_DE_GPIO
+        int "GPIO DE/RE, -1 — трансивер с автонаправлением"
+        default -1
+        help
+            Если задан, UART работает в режиме UART_MODE_RS485_HALF_DUPLEX
+            и сам переключает направление. У Waveshare ESP32-S3-RS485-CAN
+            направление автоматическое.
+
+    config PYLON_BAUD
+        int "Скорость, бод"
+        default 9600
+        help
+            ТЗ 4.2 и V3.5 1.4: 9600 8N1. V3.5 1.1 упоминает и 115200.
+
+    config PYLON_ADR
+        hex "ADR батареи"
+        default 0x02
+        help
+            Первая батарея Pylontech — адрес 2 (V3.5, стр. 3).
+
+    config PYLON_SYS_ADR
+        hex "ADR мастера для системных команд 0x60–0x64"
+        default 0x12
+        help
+            V3.5 раздел 2: системные команды — только на адреса 0x12, 0x22 … 0x72.
+            На PYLON_ADR они тоже принимаются.
+
+    config PYLON_PROTO_VER
+        hex "VER в ответе на 0x4F"
+        default 0x20
+        help
+            V3.3, 3.1: батарея игнорирует VER запроса и отвечает своей версией.
+            В остальных ответах VER повторяет запрос. diyBMS отвечает 0x28,
+            Fahmula и примеры V3.3/V3.5 — 0x20.
+
+    choice PYLON_CURRENT_UNIT
+        prompt "Шаг тока в ответе 0x42"
+        default PYLON_CURRENT_100MA
+        help
+            V3.3, 3.3: «actual value = transmission value × 100» мА, пример
+            −4000 мА = 0xFFD8. В ТЗ 4.2 указано 10 мА — это ошибка ТЗ.
+            Опция оставлена на случай нестандартного инвертора.
+            В 0x61 ток всегда в 10 мА (пример V3.5, 2.2).
+        config PYLON_CURRENT_100MA
+            bool "100 мА"
+        config PYLON_CURRENT_10MA
+            bool "10 мА"
+    endchoice
+
+    config PYLON_DCL_NEGATIVE
+        bool "DCL в 0x92 передавать отрицательным"
+        default n
+        help
+            V3.3, 3.6 знак не задаёт («A, accuracy 1»); diyBMS шлёт
+            положительный. Включать, только если инвертор не разряжает.
+
+    config PYLON_DEVICE_NAME
+        string "Имя устройства (0x51, 0x60), до 10 символов"
+        default "BMZ618031"
+
+    config PYLON_MANUFACTURER
+        string "Производитель (0x51, 0x60), до 20 символов"
+        default "PYLON"
+        help
+            Некоторые инверторы проверяют это поле.
+
+    config PYLON_SERIAL
+        string "Серийный номер (0x93, 0x60), до 16 символов"
+        default "BMSBRIDGE0000001"
+
+    config PYLON_SILENCE_S
+        int "Перестать отвечать без данных BMZ, с"
+        default 60
+        help
+            ТЗ 5.2: после 60 с без данных шлюз молчит, и инвертор
+            показывает ошибку связи.
+
+    config PYLON_LOG_FRAMES
+        bool "Печатать каждый запрос и ответ (режим «сниффер»)"
+        default n
+
+endmenu

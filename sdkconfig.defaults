@@ -1,0 +1,16 @@
+CONFIG_ESP_CONSOLE_UART_BAUDRATE_115200=y
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+
+# ТЗ 6.2: задачи шин подписаны на task watchdog, таймаут 5 с
+CONFIG_ESP_TASK_WDT_EN=y
+CONFIG_ESP_TASK_WDT_INIT=y
+CONFIG_ESP_TASK_WDT_TIMEOUT_S=5
+CONFIG_ESP_TASK_WDT_PANIC=y
+
+# Две OTA-партиции (ТЗ 6.1, компонент ota — позже)
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+
+# Legacy-драйвер driver/twai.h, как в сниффере. Переход на esp_twai — отдельной задачей.
+CONFIG_TWAI_SUPPRESS_DEPRECATE_WARN=y

@@ -1,0 +1,65 @@
+menu "Лимиты и защиты (ТЗ 4.3, 5.2)"
+    comment "Стартовые значения для LFP 16S. Сверить с порогами BMZ после реверса."
+
+    config LIM_CVL_MV
+        int "Лимит напряжения заряда, мВ"
+        range 51200 58400
+        default 56000
+        help
+            ТЗ 4.3: 56,0–56,8 В (3,50–3,55 В на ячейку).
+
+    config LIM_DVL_MV
+        int "Лимит напряжения разряда, мВ"
+        range 40000 52000
+        default 48000
+        help
+            ТЗ 4.3: 46,4–48,0 В (2,90–3,00 В на ячейку).
+
+    config LIM_UNIT_CURRENT_DA
+        int "Ток на модуль, 0,1 А"
+        default 288
+        help
+            Этикетка: 28,8 А (0,5C) на заряд и разряд.
+
+    config LIM_UNIT_TAPER_CURRENT_DA
+        int "Ток 0,1C на модуль, 0,1 А"
+        default 58
+
+    config LIM_CELL_OV_MV
+        int "Ячейка выше — CCL = 0, мВ"
+        default 3550
+
+    config LIM_CELL_TAPER_MV
+        int "Ячейка выше — плавно снижать CCL до 0,1C, мВ"
+        default 3450
+
+    config LIM_CELL_UV_MV
+        int "Ячейка ниже — DCL = 0 и charge immediately, мВ"
+        default 2900
+
+    config LIM_IMBALANCE_MV
+        int "Разбаланс больше — предупреждение, мВ"
+        default 50
+
+    config LIM_IMBALANCE_UPPER_MV
+        int "При разбалансе и ячейке выше — CCL до 0,1C, мВ"
+        default 3400
+
+    config LIM_CHARGE_TEMP_MIN_DC
+        int "Не выше — CCL = 0, 0,1 °C"
+        default 0
+
+    config LIM_TEMP_DERATE_DC
+        int "Выше — CCL и DCL вдвое, 0,1 °C"
+        default 450
+
+    config LIM_TEMP_CUTOFF_DC
+        int "Выше — CCL = DCL = 0, 0,1 °C"
+        default 550
+
+    config LIM_FORCE_CHARGE_SOC
+        int "SOC ниже — запрос charge immediately, %"
+        range 0 100
+        default 5
+
+endmenu

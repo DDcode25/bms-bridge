@@ -1,0 +1,53 @@
+menu "BMZ CAN sniffer"
+
+    config BMZ_CAN_TX_GPIO
+        int "GPIO TX (к CTX/TXD трансивера)"
+        default 5
+
+    config BMZ_CAN_RX_GPIO
+        int "GPIO RX (к CRX/RXD трансивера)"
+        default 4
+
+    config BMZ_AUTO_BAUD
+        bool "Автоопределение скорости (500k, 250k, 125k, 1M)"
+        default y
+
+    choice BMZ_BITRATE
+        prompt "Скорость по умолчанию (если трафик не найден)"
+        default BMZ_BITRATE_500K
+        config BMZ_BITRATE_125K
+            bool "125 кбит/с"
+        config BMZ_BITRATE_250K
+            bool "250 кбит/с"
+        config BMZ_BITRATE_500K
+            bool "500 кбит/с"
+        config BMZ_BITRATE_1M
+            bool "1 Мбит/с"
+    endchoice
+
+    config BMZ_PRINT_RAW
+        bool "Печатать каждый сырой кадр"
+        default y
+
+    config BMZ_KEEPALIVE_ID
+        hex "ID кадра keep-alive мастера"
+        default 0x305
+        help
+            Victron GX и многие инверторы шлют батарее 0x305 (8 байт нулей).
+            Для BMZ это гипотеза, её проверяет этот сниффер.
+
+    config BMZ_KEEPALIVE_PERIOD_MS
+        int "Период keep-alive, мс"
+        default 1000
+
+    config BMZ_KEEPALIVE_AT_START
+        bool "Включить keep-alive сразу после старта"
+        default n
+
+    config BMZ_KEEPALIVE_BUTTON_GPIO
+        int "Кнопка вкл/выкл keep-alive"
+        default 0
+        help
+            По умолчанию кнопка BOOT на плате разработчика.
+
+endmenu

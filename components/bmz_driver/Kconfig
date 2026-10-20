@@ -1,0 +1,88 @@
+menu "BMZ: источник данных"
+
+    choice BMZ_SOURCE
+        prompt "Источник"
+        default BMZ_SOURCE_SIM
+        config BMZ_SOURCE_SIM
+            bool "Симулятор (без батареи)"
+        config BMZ_SOURCE_CAN_A
+            bool "CAN, гипотеза А (Victron / Pylon CAN 0x351…)"
+    endchoice
+
+    config BMZ_MODULES
+        int "Число модулей BMZ"
+        range 1 8
+        default 1
+        help
+            Для симулятора — сколько модулей имитировать.
+            Для CAN гипотезы А — сколько модулей за одним источником,
+            если BMZ не сообщает это сам (0x359, байт 4).
+
+    config BMZ_UNIT_CAPACITY_MAH
+        int "Ёмкость модуля, мА·ч"
+        default 57600
+        help
+            Этикетка: 57,6 А·ч номинал, 48,83 А·ч доступно.
+
+    config BMZ_STALE_S
+        int "Модуль без данных дольше — исключить, с"
+        default 10
+        help
+            ТЗ 5.2: 10 с без данных — CCL = DCL = 0.
+
+    if BMZ_SOURCE_CAN_A
+
+        config BMZ_CAN_TX_GPIO
+            int "GPIO CAN TX"
+            default 5
+
+        config BMZ_CAN_RX_GPIO
+            int "GPIO CAN RX"
+            default 4
+
+        choice BMZ_CAN_BITRATE
+            prompt "Скорость CAN"
+            default BMZ_CAN_500K
+            config BMZ_CAN_250K
+                bool "250 кбит/с"
+            config BMZ_CAN_500K
+                bool "500 кбит/с"
+        endchoice
+
+        config BMZ_KEEPALIVE
+            bool "Слать keep-alive мастера"
+            default n
+            help
+                ТЗ 5.3: в шину BMZ — только команды, подтверждённые реверсом.
+                Включать после проверки сниффером.
+
+        config BMZ_KEEPALIVE_ID
+            hex "ID keep-alive"
+            depends on BMZ_KEEPALIVE
+            default 0x305
+
+        config BMZ_KEEPALIVE_PERIOD_MS
+            int "Период keep-alive, мс"
+            depends on BMZ_KEEPALIVE
+            default 1000
+
+    endif
+
+    if BMZ_SOURCE_SIM
+
+        config BMZ_SIM_CELL_MV
+            int "Симулятор: напряжение ячейки, мВ"
+            default 3300
+
+        config BMZ_SIM_TEMP_DC
+            int "Симулятор: температура, 0,1 °C"
+            default 250
+
+        config BMZ_SIM_SOC
+            int "Симулятор: SOC, %"
+            range 0 100
+            default 60
+
+    endif
+
+endmenu
